@@ -1,24 +1,37 @@
 package com.android.sergey.competitiontable;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private String[] participants = {"John", "Bob", "Alex" ,"Brown"};
     EditText inputParticipant;
     TextView outputParticipant;
-    TableLayout participateList;
-    String participant="";
+    TableLayout participateTable;
+    String participant="", pWeight =" ", pAge = " ";
+    TextView participantWeight;
+    Spinner spinnerForms;
+    Button submit,delete,toss;
     private DatabaseHandler db;
     String[] objects = {"10","11","12","13","14","15","16","17","18","19","20","21","22"};
 
@@ -28,18 +41,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        TextView participant1_name = (TextView) findViewById(R.id.participant1);
-//        TextView participant2_name = (TextView) findViewById(R.id.participant2);
-//        TextView participant3_name = (TextView) findViewById(R.id.participant3);
-//        TextView participant4_name = (TextView) findViewById(R.id.participant4);
+
 
         db = new DatabaseHandler(this);
         inputParticipant = (EditText)findViewById(R.id.inputParticipant);
-        participateList = (TableLayout)findViewById(R.id.tableLayout);
+        participantWeight = (TextView) findViewById(R.id.weight);
+        participateTable = (TableLayout)findViewById(R.id.tableLayout);
+
+        //set on click for buttons
+        submit = (Button)findViewById(R.id.buttonSubmit);
+        submit.setOnClickListener(this);
+        delete = (Button)findViewById(R.id.buttonDelete);
+        delete.setOnClickListener(this);
+        toss = (Button)findViewById(R.id.buttonToss);
+        toss.setOnClickListener(this);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, objects);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        Spinner spinnerForms = (Spinner) findViewById(R.id.participantAge);
+        spinnerForms = (Spinner) findViewById(R.id.participantAge);
         spinnerForms.setAdapter(adapter);
 
         spinnerForms.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -67,30 +87,107 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void BuildTable() {
+        Cursor cursor = db.readEntry();
 
+        int  rows = cursor.getCount();
+        int  colums = cursor.getColumnCount();
+        cursor.moveToFirst();
+
+        for (int i =0; i< rows;i++){
+
+            TableRow row = new TableRow(this);
+            row.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
+
+            for (int j = 0;j < colums; j++){
+
+                TextView tv = new TextView(this);
+                tv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                tv.setBackgroundResource(R.drawable.cell_shape);
+                tv.setGravity(Gravity.CENTER);
+                tv.setTextSize(18);
+                tv.setPadding(0, 5, 0, 5);
+
+                tv.setText(cursor.getString(j));
+                row.addView(tv);
+            }
+
+            cursor.moveToNext();
+
+           participateTable.addView(row);
+        }
     }
+
+
 
     public void onClick(View view) {
 
         Log.d("Insert: ", "Inserting ..");
         Log.d("Participan: ", participant);
+        participateTable.removeAllViews();
+        Toast toast;
 
-        participant = inputParticipant.getText().toString();
-        Toast toast =Toast.makeText(getApplicationContext(), "Participant " + participant, Toast.LENGTH_SHORT);
-        toast.show();
-        db.addContact(new Contact(participant));
+
+        switch (view.getId()) {
+            case R.id.buttonSubmit:
+                participant = inputParticipant.getText().toString();
+                pWeight = participantWeight.getText().toString();
+                pAge = spinnerForms.getSelectedItem().toString();
+                db.addContact(new Contact(participant, pWeight, pAge));
+                BuildTable();
+                toast = Toast.makeText(getApplicationContext(), "Participant " + participant + "weight" + pWeight + "age" + pAge, Toast.LENGTH_SHORT);
+                toast.show();
+                break;
+            case R.id.buttonDelete:
+                toast = Toast.makeText(getApplicationContext(), "Table deleted ", Toast.LENGTH_SHORT);
+                toast.show();
+                db.deleteAllContacts();
+                break;
+            case R.id.buttonToss:
+                tossParticipants();
+                BuildTable();
+                Intent intent = new Intent(MainActivity.this, CardActivity.class);
+                startActivity(intent);
+//                toast = Toast.makeText(getApplicationContext(), "Toss participants ", Toast.LENGTH_SHORT);
+//                toast.show();
+                break;
+        }
+    }
 
 //        Contact cn = db.getContact(10);
 //
 //        outputParticipant.setText(cn.getName());
-    }
 
-//    public void onClick(View view) {
-//        Random rnd = new Random();
-//        int index = rnd.nextInt(participants.length);
-//        Toast toast =Toast.makeText(getApplicationContext(),"Participant "+ participants[index], Toast.LENGTH_SHORT);
-//        toast.show();
+
+    public void tossParticipants() {
+        int index;
+        List<Contact> participantsList,tempList ;
+        tempList = new ArrayList<Contact>();
+        participantsList = db.getAllContacts();
+        int length = participantsList.size();
+
+        Random rnd = new Random();
 //
-//
-//    }
+//        for(int i=0; i<length;i++){
+//            participantsList.add(db.getContact(i));
+//        }
+
+
+
+        while(length>0){
+            index = rnd.nextInt(length);
+            Contact smth = participantsList.get(index);
+            tempList.add(smth);
+            participantsList.remove(index);
+//            Toast toast =Toast.makeText(getApplicationContext(),"Participant  ="+ participantsList.get(index) , Toast.LENGTH_LONG);
+//            toast.show();
+            length=length-1;
+        }
+
+
+        Toast toast =Toast.makeText(getApplicationContext(),"Participant length ="+ length , Toast.LENGTH_LONG);
+        toast.show();
+
+
+    }
 }

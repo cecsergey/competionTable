@@ -10,11 +10,24 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="input participant"
+        android:text=" "
         android:id="@+id/inputParticipant"
+        android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_toLeftOf="@+id/buttonSubmit"
+        android:layout_toStartOf="@+id/buttonSubmit" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/weight"
+        android:layout_above="@+id/buttonSubmit"
+        android:layout_toLeftOf="@+id/participantAge"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4" />
 
     <Button
         android:layout_width="wrap_content"
@@ -30,26 +43,77 @@
         android:isScrollContainer="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/buttonSubmit"
-        android:layout_toEndOf="@+id/buttonSubmit" />
+        android:layout_below="@+id/textView3"
+        android:layout_above="@+id/buttonSubmit" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/buttonSubmit"
-        android:id="@+id/scrollView">
+        android:id="@+id/scrollView"
+        android:fillViewport="false">
 
         <TableLayout
             android:id="@+id/tableLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:padding="10dp"
             android:shrinkColumns="*"
             android:stretchColumns="*" >
         </TableLayout>
     </ScrollView>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Name"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Age"
+        android:id="@+id/textView3"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/participantAge"
+        android:layout_alignStart="@+id/participantAge"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="weight"
+        android:id="@+id/textView4"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Table"
+        android:id="@+id/buttonDelete"
+        android:onClick="onClick"
+        android:layout_below="@+id/inputParticipant"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toss"
+        android:id="@+id/buttonToss"
+        android:onClick="onClick"
+        android:layout_below="@+id/participantAge"
+        android:layout_alignRight="@+id/participantAge"
+        android:layout_alignEnd="@+id/participantAge" />
 
 
 </RelativeLayout>
