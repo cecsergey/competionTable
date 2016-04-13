@@ -1,9 +1,12 @@
 package com.android.sergey.competitiontable;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Sergey on 3/22/2016.
  */
-public class Contact {
+public class Contact implements Parcelable{
     //private variables
     int _id;
     String _weight;
@@ -30,6 +33,14 @@ public class Contact {
         this._age = age;
     }
 
+
+    protected Contact(Parcel in) {
+        _id = in.readInt();
+        _name = in.readString();
+        _weight = in.readString();
+        _age = in.readString();
+
+    }
 
 
 
@@ -73,4 +84,38 @@ public class Contact {
         this._age = age;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(_id);
+        dest.writeString(_name);
+        dest.writeString(_weight);
+        dest.writeString(_age);
+
+    }
+
+    private void readToParcel(Parcel in){
+        _id = in.readInt();
+        _name = in.readString();
+        _weight = in.readString();
+        _age = in.readString();
+    }
+
+
+
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Contact createFromParcel(Parcel in) {
+            return new Contact(in);
+        }
+
+        public Contact[] newArray(int size) {
+            return new Contact[size];
+        }
+    };
 }
